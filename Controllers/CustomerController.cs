@@ -127,18 +127,28 @@ namespace BuianhtuanAssignment.Controllers
             if (dataProducr == null) return NotFound("Not found product.");
 
             var dataOrder = _context.Orders.Find(model.ProductId, model.CustomerId);
-            if (dataOrder != null) return NotFound("Order already exist.");
-
-            Order newOrder = new Order()
+            Order newOrder = new Order();
+            if (dataOrder != null)
             {
-                ProductId = model.ProductId,
-                CustomerId = model.CustomerId,
-                Price = model.Price,
-                Amount = model.Amount,
-                CreatedDate = DateTime.Now
-            };
+                newOrder.ProductId = model.ProductId;
+                newOrder.CustomerId = model.CustomerId;
+                newOrder.Price = model.Price;
+                newOrder.CreatedDate = DateTime.Now;
+                newOrder.Amount = model.Amount + dataOrder.Amount;
+                _context.Orders.Update(newOrder);
+            }
+            else
+            {
 
-            _context.Orders.Add(newOrder);
+                newOrder.ProductId = model.ProductId;
+                newOrder.CustomerId = model.CustomerId;
+                newOrder.Price = model.Price;
+                newOrder.CreatedDate = DateTime.Now;
+                newOrder.Amount = model.Amount;
+                _context.Orders.Add(newOrder);
+            }
+
+
             var eff = _context.SaveChanges();
             return eff > 0 ? Ok("Order success.") : BadRequest("Order failed.");
         }
